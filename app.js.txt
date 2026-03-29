@@ -1,0 +1,37 @@
+const map = L.map('map').setView([41.7, -8.83], 10);
+
+// base map
+L.tileLayer(
+  'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png'
+).addTo(map);
+
+// load your GeoJSON
+fetch('data/landmarks.geojson')
+  .then(r => r.json())
+  .then(data => {
+
+    const layer = L.geoJSON(data, {
+      onEachFeature: (feature, layer) => {
+        const name = feature.properties.name || "Unnamed";
+
+        layer.bindPopup(name);
+
+        // always visible labels
+        layer.bindTooltip(name, {
+          permanent: true,
+          direction: "top",
+          className: "label"
+        });
+      },
+
+      pointToLayer: (feature, latlng) =>
+        L.circleMarker(latlng, {
+          radius: 4,
+          color: "#fff",
+          fillColor: "#000",
+          fillOpacity: 1
+        })
+    }).addTo(map);
+
+    map.fitBounds(layer.getBounds());
+  });

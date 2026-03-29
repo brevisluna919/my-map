@@ -1,0 +1,38 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+}
+
+#map {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+.leaflet-tile {
+  filter: grayscale(100%) contrast(150%);
+  image-rendering: pixelated;
+}
+
+/* subtle dither */
+#map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 4px 4px;
+
+  opacity: 0.3;
+}
+
+/* labels */
+.label {
+  color: white;
+  font-family: monospace;
+  font-size: 11px;
+  text-shadow: 0 0 3px black;
+}
