@@ -1,8 +1,5 @@
-const map = L.map('map', {
-  zoomControl: true
-}).setView([41.7, -8.83], 10);
+const map = L.map('map').setView([41.7, -8.83], 10);
 
-// Darker basemap
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   {
@@ -13,36 +10,27 @@ L.tileLayer(
 let geojsonLayer;
 
 fetch('data/landmarks.geojson')
-  .then(r => r.json())
+  .then(response => response.json())
   .then(data => {
     geojsonLayer = L.geoJSON(data, {
       onEachFeature: (feature, layer) => {
         const name = feature.properties?.name || 'Unnamed location';
-
         layer.bindPopup(`<strong>${name}</strong>`);
-
-        // Only bind label text, do not force it permanently yet
         layer._labelText = name;
       },
 
-      pointToLayer: (feature, latlng) =>
-        L.circleMarker(latlng, {
+      pointToLayer: (feature, latlng) => {
+        return L.circleMarker(latlng, {
           radius: 3,
-          color: '#fff',
+          color: '#000',
           weight: 1,
           fillColor: '#000',
           fillOpacity: 1
-        }),
-
-      style: {
-        color: '#fff',
-        weight: 1.2,
-        fillOpacity: 0
+        });
       }
     }).addTo(map);
 
     map.fitBounds(geojsonLayer.getBounds());
-
     updateLabels();
   });
 
@@ -52,22 +40,20 @@ function updateLabels() {
   const zoom = map.getZoom();
 
   geojsonLayer.eachLayer(layer => {
-    const hasTooltip = !!layer.getTooltip();
     const labelText = layer._labelText;
-
     if (!labelText) return;
 
     if (zoom >= 13) {
-      if (!hasTooltip) {
+      if (!layer.getTooltip()) {
         layer.bindTooltip(labelText, {
           permanent: true,
           direction: 'top',
-          className: 'label',
-          offset: [0, -6]
+          offset: [0, -8],
+          className: 'label'
         });
       }
     } else {
-      if (hasTooltip) {
+      if (layer.getTooltip()) {
         layer.unbindTooltip();
       }
     }
